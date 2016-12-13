@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zhuoxin.meihaoshiguang"
+    android:versionCode="1"
+    android:versionName="1.0" >
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="18" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:name=".MyApplication" >
+        <activity android:name=".activity.WelcomeActivity"
+            android:screenOrientation="portrait"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        <activity
+            android:name="com.zhuoxin.meihaoshiguang.activity.MainActivity"
+             android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+        </activity>
+        
+        <activity android:name=".activity.GuideActivity"
+            android:screenOrientation="portrait"></activity>
+        
+        <activity android:name=".activity.RecipeListActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RecipeDetailActivity"
+             android:launchMode="singleTask"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RecipeStepActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.LoginActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RegistByPhoneActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RegistByPhoneAddInfoActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RegistByUserActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.SearchActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"></activity>
+        <activity android:name=".activity.RecipeCommentActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"></activity>
+    </application>
+
+</manifest>

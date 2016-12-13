@@ -1,0 +1,184 @@
+package com.uplooking.meihaoshiguang.entity;
+
+import java.io.Serializable;
+import java.util.List;
+
+import android.os.Parcelable;
+/**
+ * 菜谱详情实体类
+ * @author Li
+ *
+ */
+public class ResponceRecipeDetail implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String name;
+	private String introduce;
+	private String img;
+	private String main_materials;
+	private String assist_materials;
+	private List<RecipeStep> steps;
+	private String tips;
+	private int views;
+	private int collection_count;
+	private int comment_count;
+	private RecipeCommentsObject comments;
+	private String comment_time_stamp;
+
+	public class RecipeCommentsObject implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private int totalCount;
+		private List<RecipeComment> list;
+		private String timeStamp;
+		public int getTotalCount() {
+			return totalCount;
+		}
+		public void setTotalCount(int totalCount) {
+			this.totalCount = totalCount;
+		}
+		public List<RecipeComment> getList() {
+			return list;
+		}
+		public void setList(List<RecipeComment> list) {
+			this.list = list;
+		}
+		public String getTimeStamp() {
+			return timeStamp;
+		}
+		public void setTimeStamp(String timeStamp) {
+			this.timeStamp = timeStamp;
+		}
+	}
+	public static class RecipeComment implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		String userNickName;//评论者的昵称
+		String content;//内容
+		String commentDate;//评论的时间
+		String userHeadPhoto;//评论者头像
+		public String getUserNickName() {
+			return userNickName;
+		}
+		public void setUserNickName(String userNickName) {
+			this.userNickName = userNickName;
+		}
+		public String getContent() {
+			return content;
+		}
+		public void setContent(String content) {
+			this.content = content;
+		}
+		public String getCommentDate() {
+			return commentDate;
+		}
+		public void setCommentDate(String commentDate) {
+			this.commentDate = commentDate;
+		}
+		public String getUserHeadPhoto() {
+			return userHeadPhoto;
+		}
+		public void setUserHeadPhoto(String userHeadPhoto) {
+			this.userHeadPhoto = userHeadPhoto;
+		}
+		
+	}
+	public class RecipeStep implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		String title;
+		String img;
+		public String getTitle() {
+			return title;
+		}
+		public void setTitle(String title) {
+			this.title = title;
+		}
+		public String getImg() {
+			return img;
+		}
+		public void setImg(String img) {
+			this.img = img;
+		}
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getIntroduce() {
+		return introduce;
+	}
+	public void setIntroduce(String introduce) {
+		this.introduce = introduce;
+	}
+	public String getImg() {
+		return img;
+	}
+	public void setImg(String img) {
+		this.img = img;
+	}
+	public String getMain_materials() {
+		return main_materials;
+	}
+	public void setMain_materials(String main_materials) {
+		this.main_materials = main_materials;
+	}
+	public String getAssist_materials() {
+		return assist_materials;
+	}
+	public void setAssist_materials(String assist_materials) {
+		this.assist_materials = assist_materials;
+	}
+	public List<RecipeStep> getSteps() {
+		return steps;
+	}
+	public void setSteps(List<RecipeStep> steps) {
+		this.steps = steps;
+	}
+	public String getTips() {
+		return tips;
+	}
+	public void setTips(String tips) {
+		this.tips = tips;
+	}
+	public int getViews() {
+		return views;
+	}
+	public void setViews(int views) {
+		this.views = views;
+	}
+	public int getCollection_count() {
+		return collection_count;
+	}
+	public void setCollection_count(int collection_count) {
+		this.collection_count = collection_count;
+	}
+	public int getComment_count() {
+		return comment_count;
+	}
+	public void setComment_count(int comment_count) {
+		this.comment_count = comment_count;
+	}
+	public RecipeCommentsObject getComments() {
+		return comments;
+	}
+	public void setComments(RecipeCommentsObject comments) {
+		this.comments = comments;
+	}
+	public String getComment_time_stamp() {
+		return comment_time_stamp;
+	}
+	public void setComment_time_stamp(String comment_time_stamp) {
+		this.comment_time_stamp = comment_time_stamp;
+	}
+}

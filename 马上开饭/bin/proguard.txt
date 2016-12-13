@@ -1,0 +1,80 @@
+# view res/layout/activity_guide.xml #generated:7
+# view res/layout/activity_recipe_step.xml #generated:51
+-keep class android.support.v4.view.ViewPager { <init>(...); }
+
+# view res/layout/smssdk_contact_list_page.xml #generated:13
+-keep class cn.smssdk.gui.ContactsListView { <init>(...); }
+
+# view res/layout/smssdk_country_list_page.xml #generated:13
+-keep class cn.smssdk.gui.CountryListView { <init>(...); }
+
+# view res/layout/smssdk_contacts_listview_item.xml #generated:10
+-keep class com.mob.tools.gui.AsyncImageView { <init>(...); }
+
+# view AndroidManifest.xml #generated:18
+-keep class com.uplooking.meihaoshiguang.MyApplication { <init>(...); }
+
+# view AndroidManifest.xml #generated:38
+-keep class com.uplooking.meihaoshiguang.activity.GuideActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:55
+-keep class com.uplooking.meihaoshiguang.activity.LoginActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:33
+-keep class com.uplooking.meihaoshiguang.activity.MainActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:76
+-keep class com.uplooking.meihaoshiguang.activity.RecipeCommentActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:46
+-keep class com.uplooking.meihaoshiguang.activity.RecipeDetailActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:42
+-keep class com.uplooking.meihaoshiguang.activity.RecipeListActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:51
+-keep class com.uplooking.meihaoshiguang.activity.RecipeStepActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:59
+-keep class com.uplooking.meihaoshiguang.activity.RegistByPhoneActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:63
+-keep class com.uplooking.meihaoshiguang.activity.RegistByPhoneAddInfoActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:67
+-keep class com.uplooking.meihaoshiguang.activity.RegistByUserActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:71
+-keep class com.uplooking.meihaoshiguang.activity.SearchActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:24
+-keep class com.uplooking.meihaoshiguang.activity.WelcomeActivity { <init>(...); }
+
+# view res/layout/v_home_head_viewpager.xml #generated:13
+-keep class com.uplooking.meihaoshiguang.view.AutoScrollViewPager { <init>(...); }
+
+# view res/layout/fragment_category.xml #generated:49
+-keep class com.uplooking.meihaoshiguang.view.CategoryView { <init>(...); }
+
+# view res/layout/fragment_menu.xml #generated:11
+# view res/layout/item_home_ingredient.xml #generated:8
+# view res/layout/item_recipe_comment.xml #generated:22
+-keep class com.uplooking.meihaoshiguang.view.CircleImageView { <init>(...); }
+
+# view res/layout/v_home_head_viewpager.xml #generated:40
+-keep class com.uplooking.meihaoshiguang.view.IndicatorView { <init>(...); }
+
+# view res/layout/v_home_head.xml #generated:33
+# view res/layout/v_home_head.xml #generated:67
+-keep class com.uplooking.meihaoshiguang.view.MyGridView { <init>(...); }
+
+# view res/layout/activity_recipe_detail.xml #generated:7
+-keep class com.uplooking.meihaoshiguang.view.ParallaxScrollListView { <init>(...); }
+
+# view res/layout/activity_recipe_comment.xml #generated:40
+# view res/layout/activity_recipe_list.xml #generated:14
+-keep class com.uplooking.meihaoshiguang.view.RefreshListView { <init>(...); }
+
+# view res/layout/activity_recipe_step.xml #generated:58
+-keep class com.uplooking.meihaoshiguang.view.SlideableView { <init>(...); }
+

@@ -1,0 +1,320 @@
+package com.zhuoxin.meihaoshiguang.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Html;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.zhuoxin.meihaoshiguang.Constants;
+import com.zhuoxin.meihaoshiguang.MyApplication;
+import com.zhuoxin.meihaoshiguang.R;
+import com.zhuoxin.meihaoshiguang.adapter.RecipeStepListAdapter;
+import com.zhuoxin.meihaoshiguang.entity.ResponceRecipeDetail;
+import com.zhuoxin.meihaoshiguang.entity.ResponceRecipeDetail.RecipeComment;
+import com.zhuoxin.meihaoshiguang.entity.ResponceRecipeDetail.RecipeCommentsObject;
+import com.zhuoxin.meihaoshiguang.handler.MaterialsHandler;
+import com.zhuoxin.meihaoshiguang.handler.RecipeDetailCommentHandler;
+import com.zhuoxin.meihaoshiguang.lib.sliding_activity.SlidingActivity;
+import com.zhuoxin.meihaoshiguang.tools.BitmapHelper;
+import com.zhuoxin.meihaoshiguang.tools.IntentUtil;
+import com.zhuoxin.meihaoshiguang.tools.SharedPrefrenceTool;
+import com.zhuoxin.meihaoshiguang.tools.ToastUtil;
+import com.zhuoxin.meihaoshiguang.tools.UserPrefrence;
+import com.zhuoxin.meihaoshiguang.view.ParallaxScrollListView;
+/**
+ * 菜谱详情界面
+ *
+ */
+public class RecipeDetailActivity extends SlidingActivity implements OnClickListener, OnScrollListener, OnItemClickListener{
+	private View mBackBtn;
+	private ParallaxScrollListView mListView;
+	private HttpUtils mHttpUtils;
+	private RecipeStepListAdapter mRecipeStepListAdapter;
+	private BitmapUtils mBitmapUtils;
+	private LayoutInflater mInflater;
+	//头部视图里的控件
+	/**头部视图里显示菜谱大图片的ImageView**/
+	private ImageView mHeadBigImg;
+	private TextView mHeadRecipeNameTv;
+	/**头部视图里显示菜谱介绍的TextView**/
+	private TextView mHeadIntroduceTv;
+	/**头部视图里显示菜谱步骤的容器**/
+	private LinearLayout mMaterialsContainer;
+	/****/
+	private View mHeaderIconLayout;
+
+	private View mIconLayout;
+	private ResponceRecipeDetail recipeDetail;
+
+	//脚步视图中的控件
+	private View mFootTrickLayout;
+	private TextView mFootTrickTv;
+	private View mFooterCommentLayout;
+	
+	/**评论按钮相关**/
+	private EditText mCommentEt;
+	private View mCommentLayout,mCommentCommitBtn;
+	private Animation mCommentInAnim,mCommentOutAnim;
+	/**菜谱的id**/
+	private int recipeId;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_recipe_detail);
+		initViews();
+		mHttpUtils = new HttpUtils();
+		mBitmapUtils = BitmapHelper.getBitmapUtils(getApplicationContext());
+		loadDatas();
+		mCommentInAnim = AnimationUtils.loadAnimation(this, R.anim.comment_in);
+		mCommentOutAnim = AnimationUtils.loadAnimation(this, R.anim.comment_out);
+	}
+	/**
+	 * 加载数据
+	 */
+	private void loadDatas() {
+		recipeId = getIntent().getIntExtra("recipe_id", 0);
+		//先从SharedPreferences中根据地址获取数据
+		String jsonData = SharedPrefrenceTool.getStr(
+				getApplicationContext(), "recipe_details", ""+recipeId);
+		//如果获取到的数据不为空，则直接处理数据并显示；否则从网络获取数据
+		if(!TextUtils.isEmpty(jsonData)){
+			final ResponceRecipeDetail object = new Gson().fromJson(jsonData, ResponceRecipeDetail.class);
+			//连接服务器，查看是否评论有更新
+			String url = Constants.URL_GET_BRIEF_COOK_COMMENTS
+					.replace("_cook_id", recipeId+"")
+					.replace("_time_stamp", object.getComment_time_stamp());
+			mHttpUtils.send(HttpMethod.GET, url, new RequestCallBack<Object>() {
+
+				@Override
+				public void onFailure(HttpException arg0, String arg1) {
+					loadDataFromObject(object);
+				}
+
+				@Override
+				public void onSuccess(ResponseInfo<Object> arg0) {
+					String result = (String) arg0.result;
+					RecipeCommentsObject comments = new Gson().fromJson(result, RecipeCommentsObject.class);
+					if(comments.getTotalCount() != 0){
+						object.setComments(comments);
+						object.setComment_time_stamp(comments.getTimeStamp());
+						//将数据存入SharedPreference
+						SharedPrefrenceTool.put(getApplicationContext(), 
+								"recipe_details", recipeId+"", new Gson().toJson(object));
+					}
+					loadDataFromObject(object);
+				}
+			});
+
+		}else{
+			loadDataFromNetwork();
+		}
+
+	}
+	/**
+	 * 从服务器获取菜谱详情
+	 */
+	private void loadDataFromNetwork() {
+		String url = Constants.URL_RECIPE_DETAIL.replace("_id", recipeId+"");
+		mHttpUtils.send(HttpMethod.GET, url , new RequestCallBack<Object>() {
+
+			@Override
+			public void onFailure(HttpException arg0, String arg1) {
+				
+			}
+			@Override
+			public void onSuccess(ResponseInfo<Object> arg0) {
+				String result =  arg0.result.toString();
+				ResponceRecipeDetail recipeDetail = new Gson().fromJson(result, ResponceRecipeDetail.class);
+				//将数据存入SharedPreference
+				SharedPrefrenceTool.put(getApplicationContext(), 
+						"recipe_details", recipeId+"", result);
+				loadDataFromObject(recipeDetail);
+			}
+		});
+	}
+	/**
+	 * 将菜谱详情实体类里的数据显示在界面上
+	 * @param object
+	 */
+	protected void loadDataFromObject(ResponceRecipeDetail recipeDetail) {
+		mListView.addHeaderView(getHeadView());
+		mListView.addFooterView(getFootView());
+
+		/**设置头部的大图片**/
+		mBitmapUtils.display(mHeadBigImg, recipeDetail.getImg());
+		//设置菜谱名字
+		mHeadRecipeNameTv.setText(recipeDetail.getName());
+		//设置菜谱的介绍(要判断有没有菜谱介绍信息)
+		if(!TextUtils.isEmpty(recipeDetail.getIntroduce())){
+			mHeadIntroduceTv.setText(Html.fromHtml(recipeDetail.getIntroduce()));
+		}
+		//设置食材
+		MaterialsHandler materialsHandler = new MaterialsHandler(RecipeDetailActivity.this);
+		materialsHandler.setDatas(mMaterialsContainer, recipeDetail.getMain_materials(), recipeDetail.getAssist_materials());
+		//多说几句
+		if(!TextUtils.isEmpty(recipeDetail.getTips())){
+			mFootTrickLayout.setVisibility(View.VISIBLE);
+			mFootTrickTv.setText(Html.fromHtml(recipeDetail.getTips()));
+		}
+		//处理 评论
+		RecipeCommentsObject comments = recipeDetail.getComments();
+		commentHandler = new RecipeDetailCommentHandler(this);
+		commentHandler.setDatas(mFooterCommentLayout, comments,recipeId);
+		//获取菜谱步骤的集合数据，并填充listView
+		mRecipeStepListAdapter = new RecipeStepListAdapter(RecipeDetailActivity.this, recipeDetail.getSteps());
+		mListView.setAdapter(mRecipeStepListAdapter);
+	}
+	/**
+	 * 获取ListView的头部视图
+	 * @return
+	 */
+	private View getHeadView() {
+		View headView = mInflater.inflate(R.layout.v_recipe_detail_head, null);
+		mHeadBigImg = (ImageView) headView.findViewById(R.id.v_recipe_detail_head_imageview);
+		mHeadRecipeNameTv = (TextView) headView.findViewById(R.id.v_recipe_detail_head_recipeNameTv);
+		mHeadIntroduceTv = (TextView) headView.findViewById(R.id.v_recipe_detail_head_introduceTv);
+		mMaterialsContainer = (LinearLayout) headView.findViewById(R.id.v_recipe_header_detail_material_container);
+		mHeaderIconLayout = headView.findViewById(R.id.v_header_hideableview);
+		return headView;
+	}
+	/**
+	 * 获取ListView的脚步视图
+	 * @return
+	 */
+	protected View getFootView() {
+		View footView = mInflater.inflate(R.layout.v_recipe_detail_foot, null);
+		mFootTrickLayout = footView.findViewById(R.id.recipe_detail_footer_trick_layout);
+		mFootTrickTv = (TextView) footView.findViewById(R.id.recipe_detail_footer_trick_content);
+		mFooterCommentLayout = footView.findViewById(R.id.v_recipe_detail_comment_layout);
+		return footView;
+	}
+	/**
+	 * 初始化控件
+	 * 
+	 */
+	private void initViews() {
+		mInflater = LayoutInflater.from(this);
+		mBackBtn = findViewById(R.id.back);
+		mBackBtn.setOnClickListener(this);
+		mListView = (ParallaxScrollListView) findViewById(R.id.listView);
+		mListView.setOnScrollListener(this);
+		mIconLayout = findViewById(R.id.recipe_detail_top_right_icon_layout);
+		mListView.setOnItemClickListener(this);
+		mCommentLayout = findViewById(R.id.comment_layout);
+		mCommentEt = (EditText) findViewById(R.id.comment_input);
+		mCommentCommitBtn = findViewById(R.id.comment_commit);
+		mCommentCommitBtn.setOnClickListener(this);
+		mCommentLayout.setVisibility(View.GONE);
+	}
+	@Override
+	public void onClick(View v) {
+		if(v == mBackBtn){
+			onBackPressed();
+		}else if(v == mCommentCommitBtn){
+			if(UserPrefrence.isLogin(getApplicationContext())){
+				commentAction();
+				mCommentEt.getEditableText().clear();
+			}else{
+				ToastUtil.show(this, "此操作需要登入");
+				MyApplication app = (MyApplication) getApplication();
+				app.cls = this.getClass();
+				Intent intent = new Intent(this, LoginActivity.class);
+				IntentUtil.startActivity(this, intent);
+			}
+		}
+	}
+	/**
+	 * 提交评论
+	 */
+	private void commentAction() {
+		String commentContent = mCommentEt.getText().toString();
+		if(TextUtils.isEmpty(commentContent)){
+			ToastUtil.show(getApplicationContext(), getString(R.string.please_input_comment_content));
+		}else{
+			RequestParams params = new RequestParams();
+			params.addBodyParameter("user_name", UserPrefrence.getUserName(getApplicationContext()));
+			params.addBodyParameter("cook_id", recipeId+"");
+			params.addBodyParameter("content", mCommentEt.getText().toString());
+			//提交评论
+			new HttpUtils().send(HttpMethod.POST, Constants.URL_ADD_COOK_COMMENT, params , commentCallBack);
+		}
+	}
+	RequestCallBack<Object> commentCallBack = new RequestCallBack<Object>() {
+
+		@Override
+		public void onSuccess(ResponseInfo<Object> responseInfo) {
+			String result = (String) responseInfo.result;
+			if("1".equals(result)){
+				RecipeComment comment = new RecipeComment();
+				comment.setContent(mCommentEt.getText().toString());
+				comment.setCommentDate(System.currentTimeMillis()+"");
+				comment.setUserHeadPhoto(UserPrefrence.getHeadPhoto(getApplicationContext()));
+				comment.setUserNickName(UserPrefrence.getNickName(getApplicationContext()));
+				commentHandler.addComment(comment);
+				mListView.setSelection(mListView.getAdapter().getCount()+3);
+			}
+		}
+
+		@Override
+		public void onFailure(HttpException error, String msg) {
+			ToastUtil.show(getApplicationContext(), getString(R.string.network_error_retry_later));
+		}
+	};
+	private RecipeDetailCommentHandler commentHandler;
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+	}
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		if(firstVisibleItem == 0 && mListView.getChildAt(0) != null){
+			if(-mListView.getChildAt(0).getTop() >= mHeaderIconLayout.getTop()){
+				mIconLayout.setVisibility(View.VISIBLE);
+				mHeaderIconLayout.setVisibility(View.INVISIBLE);
+				if(mCommentLayout.getVisibility() == View.GONE){
+					mCommentLayout.setVisibility(View.VISIBLE);
+					mCommentLayout.startAnimation(mCommentInAnim);
+				}
+			}else{
+				mIconLayout.setVisibility(View.GONE);
+				mHeaderIconLayout.setVisibility(View.VISIBLE);
+				if(mCommentLayout.getVisibility() == View.VISIBLE){
+					mCommentLayout.setVisibility(View.GONE);
+					mCommentLayout.startAnimation(mCommentOutAnim);
+				}
+			}
+		}
+	}
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		if(position != 0){
+			Intent intent = new Intent(this, RecipeStepActivity.class);
+			intent.putExtra("object", recipeDetail);
+			intent.putExtra("position", position-1);
+			startActivity(intent);
+		}
+	}
+}
